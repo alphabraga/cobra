@@ -1,2 +1,0 @@
-montydb==2.4.0
-pymongo==4.2.0
