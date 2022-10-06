@@ -1,17 +1,19 @@
-from urllib import request
 from flask import Blueprint, jsonify, request
-import random
 from math import modf
 from bson.objectid import ObjectId
 from config.database import connection
+from random import random
+import os
 
 blueprint = Blueprint('users', __name__)
 
 @blueprint.route('/random')
 def lotery():
 
-    random_number = modf(random.random()*100000)[1]
-    return jsonify({'message': f"o número mágico é {random_number}"})
+    number = int(random()*100000000)
+    hostname = os.uname()[1]
+
+    return jsonify({'number': number, 'hostname': hostname})
 
 @blueprint.route('/user')
 def index():
@@ -20,10 +22,7 @@ def index():
     result = []
 
     for user in users:
-        result.append({'_id':  str(user.get('_id')), 
-                        'id':  str(user.get('id')), 
-                        'nome': user.get('nome'), 
-                        'email': user.get('email')})
+        result.append({'_id':  str(user.get('_id')), 'id':  str(user.get('id')),  'nome': user.get('nome'),  'email': user.get('email')})
 
     return jsonify(result)
 
@@ -38,10 +37,7 @@ def add():
     result = db.users.insert_one(data)
     user = db.users.find_one(result.inserted_id)
 
-    return jsonify({'_id':  str(user.get('_id')), 
-                     'id':  str(user.get('id')), 
-                     'nome': user.get('nome'), 
-                     'email': user.get('email')})
+    return jsonify({'_id':  str(user.get('_id')), 'id':  str(user.get('id')), 'nome': user.get('nome'), 'email': user.get('email')})
 
 @blueprint.route('/user/<id>', methods=["PUT"])
 def edit(id):
@@ -57,10 +53,7 @@ def edit(id):
     if user is None:
         return jsonify({'message': 'Data not found'}), 404
 
-    return jsonify({'_id':  str(user.get('_id')), 
-                    'id':  str(user.get('id')), 
-                    'nome': user.get('nome'), 
-                    'email': user.get('email')})
+    return jsonify({'_id':  str(user.get('_id')), 'id':  str(user.get('id')), 'nome': user.get('nome'), 'email': user.get('email')})
 
 @blueprint.route('/user/<id>', methods=["DELETE"])
 def delete(id):
@@ -85,9 +78,6 @@ def show(id):
     if user is None:
         return jsonify({'message': 'Data not found'}), 404
 
-    result = {'_id':  str(user.get('_id')), 
-               'id':  user.get('id'), 
-               'nome': user.get('nome'), 
-               'email': user.get('email')}
+    result = {'_id':  str(user.get('_id')), 'id':  user.get('id'), 'nome': user.get('nome'), 'email': user.get('email')}
 
     return jsonify(result)
